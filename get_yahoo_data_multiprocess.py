@@ -30,7 +30,7 @@ class YahooData:
         prices_df.index.names = ['ticker', 'date']
         self.historical_prices = prices_df
         return prices_df
-        # comments for multiindex slicing :
+        # comments for multiindex slicing:
         #print(prices_df.index.names)
         #print(prices_df.loc[(slice(None), '2018-12-27'),:])
         #print(prices_df.index.get_level_values(0))
