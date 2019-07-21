@@ -16,9 +16,9 @@ class YahooData:
         self.YF = yf(self.tickers)
         self.name = name
 
-    def get_price_data(self, start=None, end=None):
+    def get_price_data(self, start_date=None, end_date=None):
 
-        all_prices = self.YF.get_historical_price_data(self.start_date, self.end_date, 'daily')
+        all_prices = self.YF.get_historical_price_data(start_date, end_date, 'daily')
         prices_df = pd.DataFrame()
         for key, val in all_prices.items():
             prices = all_prices[key]['prices']
@@ -29,7 +29,7 @@ class YahooData:
             prices_df = prices_df.append(df)
         prices_df.index.names = ['ticker', 'date']
         self.historical_prices = prices_df
-        return prices_df
+        df.to_csv('prices/{}'.format(self.name))
         # comments for multiindex slicing:
         #print(prices_df.index.names)
         #print(prices_df.loc[(slice(None), '2018-12-27'),:])
@@ -49,7 +49,9 @@ class YahooData:
         df = df.append(pd.DataFrame(book_value, index=['book_value'])).transpose()
         df.to_csv('stocks/{}'.format(self.name))
 
-def my_func(tickers):
+
+
+def get_cross_sectional_data(tickers):
     name = '{}.csv'.format(tickers[0])
     try:
         yd = YahooData(tickers=tickers, name=name)
@@ -58,13 +60,23 @@ def my_func(tickers):
         print('couldnt get data for ticker: {}'.format(tickers[0]))
         print('here is error: ', e)
 
+def get_historical_price_data(tickers, start_date='2012-01-01', end_date='2019-07-18'):
+    name = '{}.csv'.format(tickers[0])
+    try:
+        yd = YahooData(tickers=tickers, name=name)
+        yd.get_price_data(start_date=start_date, end_date=end_date)
+    except Exception as e:
+        print('couldnt get price data for ticker: {}'.format(tickers[0]))
+        print('here is error: ', e)
+
 if __name__ == '__main__':
     pool = mp.Pool(processes=8)
     df = pd.read_csv('tickers.csv')
     #yd = YahooData(tickers=df['tickers'].values)
     #yd = YahooData()
     args = [list(v) for v in df.values]
-    list(tqdm(pool.imap(my_func, args), total=1000))
+    #list(tqdm(pool.imap(get_cross_sectional_data, args), total=1000))
+    list(tqdm(pool.imap(get_historical_price_data, args), total=1000))
 
 
 
