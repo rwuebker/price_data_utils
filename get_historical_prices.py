@@ -17,6 +17,7 @@ class HistoricalPrices:
 
         prices.columns = ['ticker', 'date', 'high', 'low', 'adjclose', 'volume']
         prices = prices.set_index(['ticker', 'date'])
+        self.prices = prices
 
 
 if __name__ == '__main__':
