@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import datetime as dt
 import multiprocessing as mp
+import os
 import pandas as pd
 from pandas_finance import Equity
 from tqdm import tqdm
@@ -12,18 +13,20 @@ class YahooData:
         self.ticker = ticker
         self.YF = yf(ticker)
         self.PF = Equity(ticker)
+        self.date_str = dt.date.today().strftime('%Y-%m-%d')
+        self.prices_dir = 'prices/prices_{}'.format(self.date_str)
+        self.info_dir = 'info/info_{}'.format(self.date_str)
 
     def cache_price_data(self):
 
         prices = self.PF.trading_data
-        prices.to_csv('new_prices/{}.csv'.format(self.ticker))
-        # comments for multiindex slicing:
-        #print(prices_df.index.names)
-        #print(prices_df.loc[(slice(None), '2018-12-27'),:])
-        #print(prices_df.index.get_level_values(0))
+        if not os.path.exists(self.prices_dir):
+            os.mkdir(self.prices_dir)
+        prices.to_csv('{}/{}.csv'.format(self.prices_dir, self.ticker))
 
     def cache_cross_sectional_data(self):
         data = {
+            'ticker': self.ticker,
             'mkt_cap': self.YF.get_market_cap(),
             'cur_price': self.YF.get_current_price(),
             'prev_price': self.YF.get_prev_close_price(),
@@ -33,7 +36,9 @@ class YahooData:
             'eps': self.YF.get_earnings_per_share()
         }
         df = pd.DataFrame(data, index=[self.ticker])
-        df.to_csv('new_stocks/{}.csv'.format(self.ticker))
+        if not os.path.exists(self.info_dir):
+            os.mkdir(self.info_dir)
+        df.to_csv('{}/{}.csv'.format(self.info_dir, self.ticker), index=False)
 
 
 def get_cross_sectional_data(ticker):
