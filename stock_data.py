@@ -66,7 +66,7 @@ if __name__ == '__main__':
     args = list(df['tickers'])
 
     list(tqdm(pool.imap(get_cross_sectional_data, args), total=total))
-    #list(tqdm(pool.imap(get_historical_price_data, args), total=total))
+    list(tqdm(pool.imap(get_historical_price_data, args), total=total))
 
 
 
