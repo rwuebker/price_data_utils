@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# Gets stock data from the world wide webs
+
 import datetime as dt
 import multiprocessing as mp
 import os

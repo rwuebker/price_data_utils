@@ -71,6 +71,9 @@ class DataLoader:
                     new_df = pd.DataFrame(data, index=[ticker])
                     totals = totals.append(new_df)
             final = pd.merge(info, totals, left_index=True, right_index=True)
+        else:
+            print('path doesnt exist: ')
+            print(path)
 
         self.info = final
         print(final.head())
