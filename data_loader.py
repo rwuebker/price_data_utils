@@ -52,6 +52,7 @@ class DataLoader:
         path = '{}/prices_{}'.format(self.prices_dir, '2019-07-26')
         info = self.info
         totals = pd.DataFrame()
+        prices = pd.DataFrame()
         if os.path.exists(path):
             for filename in tqdm(os.listdir(path)):
                 if filename.endswith('.csv'):
@@ -59,17 +60,13 @@ class DataLoader:
                     self._initialize_date_set(ticker)
                     full_file_name = '{}/{}'.format(path, filename)
                     df = pd.read_csv(full_file_name, index_col='Date')
-                    data = {
-                            "month_ago": self._get_value(ticker, df, 'month_ago', 'Adj Close'),
-                            "year_ago": self._get_value(ticker, df, 'year_ago', 'Adj Close'),
-                            "prev_date": self._get_value(ticker, df, 'prev_date', 'Adj Close'),
-                            "analysis_date": self._get_value(ticker, df, 'analysis_date', 'Adj Close'),
-                            "trade_date": self._get_value(ticker, df, 'trade_date', 'Adj Close'),
-                            "pred_date": self._get_value(ticker, df, 'pred_date', 'Adj Close'),
-                            "volume": self._get_value(ticker, df, 'analysis_date', 'Volume')
-                    }
-                    new_df = pd.DataFrame(data, index=[ticker])
+                    temp_df = self._load_price_specific_dates(df)
                     totals = totals.append(new_df)
+
+                    df['ticker'] = ticker
+                    df.set_index(['ticker', 'Date'], inplace=True)
+                    prices = prices.append(df)
+
             final = pd.merge(info, totals, left_index=True, right_index=True)
         else:
             print('path doesnt exist: ')
@@ -77,6 +74,19 @@ class DataLoader:
 
         self.info = final
         print(final.head())
+
+    def _load_price_specific_dates(self, df):
+        data = {
+                "month_ago": self._get_value(ticker, df, 'month_ago', 'Adj Close'),
+                "year_ago": self._get_value(ticker, df, 'year_ago', 'Adj Close'),
+                "prev_date": self._get_value(ticker, df, 'prev_date', 'Adj Close'),
+                "analysis_date": self._get_value(ticker, df, 'analysis_date', 'Adj Close'),
+                "trade_date": self._get_value(ticker, df, 'trade_date', 'Adj Close'),
+                "pred_date": self._get_value(ticker, df, 'pred_date', 'Adj Close'),
+                "volume": self._get_value(ticker, df, 'analysis_date', 'Volume')
+        }
+        return pd.DataFrame(data, index=[ticker])
+
 
     def _initialize_date_set(self, ticker):
         date_set = {
