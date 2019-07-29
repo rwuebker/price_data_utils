@@ -21,7 +21,7 @@ class HistoricalPrices:
             job.start()
             jobs.append(job)
 
-        for job in tqdm(jobs, position=2):
+        for job in jobs:
             job.join()
 
         prices = pd.concat(d.values(), ignore_index=True)
