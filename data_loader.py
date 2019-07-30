@@ -36,7 +36,7 @@ class DataLoader:
 
     def check_cached(self):
         cached_path = '{}/data/data_{}_periods_{}.csv'.format(self.cached_dir, self.analysis_date_str, self.periods)
-        date_sets_path = '{}/date_sets/date_set_{}_periods_{}.csv'.format(self.cached_dir, self.analysis_date_str, self.periods)
+        date_sets_path = '{}/date_sets/date_set_{}_periods_{}.json'.format(self.cached_dir, self.analysis_date_str, self.periods)
         if os.path.exists(cached_path) and os.path.exists(date_sets_path):
             df = pd.read_csv(cached_path, index_col=0)
             self.data = df
@@ -49,7 +49,7 @@ class DataLoader:
 
     def _cache_items(self):
         cached_path = '{}/data/data_{}_periods_{}.csv'.format(self.cached_dir, self.analysis_date_str, self.periods)
-        date_sets_path = '{}/date_sets/date_set_{}_periods_{}.csv'.format(self.cached_dir, self.analysis_date_str, self.periods)
+        date_sets_path = '{}/date_sets/date_set_{}_periods_{}.json'.format(self.cached_dir, self.analysis_date_str, self.periods)
         if not os.path.exists('{}/data'.format(self.cached_dir)):
             os.mkdirs('{}/data'.format(self.cached_dir))
         self.data.to_csv(cached_path)
