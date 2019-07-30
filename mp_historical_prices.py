@@ -1,10 +1,11 @@
+import datetime as dt
 import os
 import pandas as pd
 from tqdm import tqdm
 from multiprocessing import Manager, Process
 
 class HistoricalPrices:
-    def __init__(self, start_date=None, num_assets=967, num_days=None, prices_dir='prices/prices_2019-07-26'):
+    def __init__(self, start_date=None, num_assets=967, num_days=None, prices_dir='prices/prices_{}'.format(dt.date.today().strftime('%Y-%m-%d'))):
         self.num_days = num_days
         self.num_assets = num_assets
         self.start_date = start_date
