@@ -82,7 +82,6 @@ class DataLoader:
 
     def _load_prices(self):
         path = '{}/prices_{}'.format(self.prices_dir, self.pred_date_str)
-        #path = '{}/prices_{}'.format(self.prices_dir, '2019-07-26')
         info = self.info
         totals = pd.DataFrame()
         prices = pd.DataFrame()
@@ -161,6 +160,6 @@ class DataLoader:
 
 
 if __name__ == '__main__':
-    fa = DataLoader(analysis_date_str='2019-07-25')
+    fa = DataLoader(analysis_date_str='2019-07-26')
     fa.load_data()
     print(fa.data.head())
