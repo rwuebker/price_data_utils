@@ -160,6 +160,9 @@ class DataLoader:
 
 
 if __name__ == '__main__':
-    fa = DataLoader(analysis_date_str='2019-07-26')
+    today = dt.date.today()
+    analysis_date = today - BDay(2)
+    analysis_date_str = analysis_date.strftime('%Y-%m-%d')
+    fa = DataLoader(analysis_date_str=analysis_date_str)
     fa.load_data()
     print(fa.data.head())
