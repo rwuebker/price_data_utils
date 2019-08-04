@@ -14,9 +14,10 @@ class HistoricalPrices:
 
 
     def check_cached(self):
-        cached_path = '{}/prices/prices_{}.csv'.format(self.cached_dir, self.date_str)
+        cached_path = '{}/prices/prices_{}.pickle'.format(self.cached_dir, self.date_str)
         if os.path.exists(cached_path):
-            self.prices = pd.read_csv(cached_path, index_col='Date')
+            self.prices = pd.read_pickle(cached_path)
+            self.prices.set_index('Date')
             return True
         return False
 
@@ -52,11 +53,11 @@ class HistoricalPrices:
             d[ticker] = df
 
     def cache_prices(self):
-        cached_path = '{}/prices/prices_{}.csv'.format(self.cached_dir, self.date_str)
+        cached_path = '{}/prices/prices_{}.pickle'.format(self.cached_dir, self.date_str)
         if not os.path.exists('{}/prices'.format(self.cached_dir)):
             os.mkdirs('{}/prices'.format(self.cached_dir))
         prices = self.prices.reset_index()
-        prices.to_csv(cached_path, index=False)
+        prices.to_pickle(cached_path)
 
 if __name__ == '__main__':
     hp = HistoricalPrices()
