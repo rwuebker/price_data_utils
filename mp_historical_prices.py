@@ -55,7 +55,7 @@ class HistoricalPrices:
     def cache_prices(self):
         cached_path = '{}/prices/prices_{}.pickle'.format(self.cached_dir, self.date_str)
         if not os.path.exists('{}/prices'.format(self.cached_dir)):
-            os.mkdirs('{}/prices'.format(self.cached_dir))
+            os.makedirs('{}/prices'.format(self.cached_dir))
         prices = self.prices.reset_index()
         prices.to_pickle(cached_path)
 
