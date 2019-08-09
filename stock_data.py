@@ -3,6 +3,7 @@
 
 import datetime as dt
 import multiprocessing as mp
+from multiprocessing import Process
 import os
 import pandas as pd
 from pandas_finance import Equity
@@ -62,13 +63,28 @@ def get_historical_price_data(ticker):
 
 
 if __name__ == '__main__':
-    pool = mp.Pool(processes=mp.cpu_count())
+    #pool = mp.Pool(processes=mp.cpu_count())
     df = pd.read_csv('tickers.csv')
     total = len(df)
-    args = list(df['tickers'])
+    tickers = list(df['tickers'])
 
-    list(tqdm(pool.imap(get_cross_sectional_data, args), total=total))
-    list(tqdm(pool.imap(get_historical_price_data, args), total=total))
+    #list(tqdm(pool.imap(get_cross_sectional_data, args), total=total))
+    #list(tqdm(pool.imap(get_historical_price_data, args), total=total))
+    jobs = []
+    for ticker in tqdm(tickers, position=1):
+        job = Process(target=get_cross_sectional_data, args=(ticker,))
+        job.start()
+        jobs.append(job)
 
+    for job in jobs:
+        job.join()
 
+    jobs = []
+    for ticker in tqdm(tickers, position=2):
+        job = Process(target=get_historical_price_data, args=(ticker,))
+        job.start()
+        jobs.append(job)
+
+    for job in jobs:
+        job.join()
 
