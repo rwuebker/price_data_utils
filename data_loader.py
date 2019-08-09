@@ -51,10 +51,10 @@ class DataLoader:
         cached_path = '{}/data/data_{}_periods_{}.csv'.format(self.cached_dir, self.analysis_date_str, self.periods)
         date_sets_path = '{}/date_sets/date_set_{}_periods_{}.json'.format(self.cached_dir, self.analysis_date_str, self.periods)
         if not os.path.exists('{}/data'.format(self.cached_dir)):
-            os.mkdirs('{}/data'.format(self.cached_dir))
+            os.makedirs('{}/data'.format(self.cached_dir))
         self.data.to_csv(cached_path)
         if not os.path.exists('{}/date_sets'.format(self.cached_dir)):
-            os.mkdirs('{}/date_sets'.format(self.cached_dir))
+            os.makedirs('{}/date_sets'.format(self.cached_dir))
         with open(date_sets_path, 'w') as f:
             json.dump(self.date_sets, f, indent=4, sort_keys=True, default=str)
 
@@ -70,14 +70,17 @@ class DataLoader:
         # use last business days date for info
         path = '{}/info_{}'.format(self.info_dir, self.analysis_date_str)
         totals = pd.DataFrame()
-        if os.path.exists(path):
-            for filename in os.listdir(path):
-                if filename.endswith('.csv'):
-                    df = pd.read_csv('{}/{}'.format(path, filename))
-                    df.columns = ['ticker', 'mkt_cap', 'cur_price', 'prev_price', 'beta', 'book_value', 'sector', 'eps']
-                    df.set_index('ticker', inplace=True)
-                    df.drop(['cur_price', 'prev_price'], axis=1, inplace=True)
-                    totals = totals.append(df)
+        if not os.path.exists():
+            raise Exception('File not found: {}'.format(path))
+
+        for filename in os.listdir(path):
+            if filename.endswith('.csv'):
+                df = pd.read_csv('{}/{}'.format(path, filename))
+                df.columns = ['ticker', 'mkt_cap', 'cur_price', 'prev_price', 'beta', 'book_value', 'sector', 'eps']
+                df.set_index('ticker', inplace=True)
+                df.drop(['cur_price', 'prev_price'], axis=1, inplace=True)
+                totals = totals.append(df)
+
         self.info = totals
 
     def _load_prices(self):
@@ -85,21 +88,20 @@ class DataLoader:
         info = self.info
         totals = pd.DataFrame()
         prices = pd.DataFrame()
-        if os.path.exists(path):
-            for filename in tqdm(os.listdir(path)):
-                if filename.endswith('.csv'):
-                    ticker = filename.replace('.csv', '')
-                    self._initialize_date_set(ticker)
-                    full_file_name = '{}/{}'.format(path, filename)
-                    df = pd.read_csv(full_file_name, index_col='Date')
-                    temp_df = self._load_price_specific_dates(df, ticker)
-                    totals = totals.append(temp_df)
-                    prices = prices.append(df)
+        if not os.path.exists(path):
+            raise Exception('File not found: {}'.format(path))
 
-            self.data = pd.merge(info, totals, left_index=True, right_index=True)
-        else:
-            print('path doesnt exist: ')
-            print(path)
+        for filename in tqdm(os.listdir(path)):
+            if filename.endswith('.csv'):
+                ticker = filename.replace('.csv', '')
+                self._initialize_date_set(ticker)
+                full_file_name = '{}/{}'.format(path, filename)
+                df = pd.read_csv(full_file_name, index_col='Date')
+                temp_df = self._load_price_specific_dates(df, ticker)
+                totals = totals.append(temp_df)
+                prices = prices.append(df)
+
+        self.data = pd.merge(info, totals, left_index=True, right_index=True)
 
     def _load_price_specific_dates(self, df, ticker):
         data = {
