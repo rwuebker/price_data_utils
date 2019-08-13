@@ -70,7 +70,7 @@ class DataLoader:
         # use last business days date for info
         path = '{}/info_{}'.format(self.info_dir, self.analysis_date_str)
         totals = pd.DataFrame()
-        if not os.path.exists():
+        if not os.path.exists(path):
             raise Exception('File not found: {}'.format(path))
 
         for filename in os.listdir(path):
@@ -113,7 +113,12 @@ class DataLoader:
                 "pred_date": self._get_value(ticker, df, 'pred_date', 'Adj Close'),
                 "volume": self._get_value(ticker, df, 'analysis_date', 'Volume')
         }
-        return pd.DataFrame(data, index=[ticker])
+        try:
+            df =  pd.DataFrame(data, index=[ticker])
+        except Exception as e:
+            print('this is ticker: ', ticker)
+            exit()
+        return df
 
 
     def _initialize_date_set(self, ticker):
